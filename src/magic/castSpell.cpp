@@ -148,12 +148,13 @@ void castSpellInit(Uint32 caster_uid, spell_t* spell)
 		return;
 	}
 
-    // Entity cannot cast spells while asleep
-    if ( stat->EFFECTS[EFF_ASLEEP] )
-    {
-        return;
-    }
+  // Entity cannot cast spells while asleep
+  if ( stat->EFFECTS[EFF_ASLEEP] )
+  {
+      return;
+  }
 
+  // Calculate cost of spell for Singleplayer
 	if ( spell->ID == SPELL_MAGICMISSILE && skillCapstoneUnlocked(player, PRO_SPELLCASTING) )
 	{
 		//Spellcasting capstone.
@@ -295,11 +296,18 @@ Entity* castSpell(Uint32 caster_uid, spell_t* spell, bool using_magicstaff, bool
 			magiccost = cast_animation.mana_left;
 			caster->drainMP(magiccost);
 		}
-		else
+		else // Calculate cost of spell for Multiplayer
 		{
-			//TODO: Fix issue #141: Spellcasting capstone doesn't work in multiplayer.
-			magiccost = getCostOfSpell(spell);
-			caster->drainMP(magiccost);
+      if ( spell->ID == SPELL_MAGICMISSILE && skillCapstoneUnlocked(player, PRO_SPELLCASTING) )
+      {
+          //Spellcasting capstone.
+          magiccost = 0;
+      }
+      else
+      {
+          magiccost = getCostOfSpell(spell);
+          caster->drainMP(magiccost);
+      }
 		}
 	}
 
