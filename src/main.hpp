@@ -583,6 +583,8 @@ pathnode_t* newPathnode(list_t* list, Sint32 x, Sint32 y, pathnode_t* parent, Si
 #define FLIP_VERTICAL 1
 #define FLIP_HORIZONTAL 2
 SDL_Surface* flipSurface(SDL_Surface* surface, int flags);
+void drawCircle(int x, int y, real_t radius, const float* const pColor, Uint8 alpha);
+void drawArc(int x, int y, real_t radius, real_t angle1, real_t angle2, const float* const pColor, Uint8 alpha);
 void drawCircle(int x, int y, real_t radius, Uint32 color, Uint8 alpha);
 void drawArc(int x, int y, real_t radius, real_t angle1, real_t angle2, Uint32 color, Uint8 alpha);
 void drawLine(int x1, int y1, int x2, int y2, Uint32 color, Uint8 alpha);

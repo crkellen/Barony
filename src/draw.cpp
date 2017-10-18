@@ -178,7 +178,12 @@ SDL_Surface* flipSurface( SDL_Surface* surface, int flags )
 
 -------------------------------------------------------------------------------*/
 
-void drawCircle( int x, int y, real_t radius, Uint32 color, Uint8 alpha )
+void drawCircle( int x, int y, real_t radius, const float* const pColor, Uint8 alpha )
+{
+	drawArc(x, y, radius, 0, 360, pColor, alpha);
+}
+
+void drawCircle(int x, int y, real_t radius, Uint32 color, Uint8 alpha)
 {
 	drawArc(x, y, radius, 0, 360, color, alpha);
 }
@@ -191,7 +196,44 @@ void drawCircle( int x, int y, real_t radius, Uint32 color, Uint8 alpha )
 
 -------------------------------------------------------------------------------*/
 
-void drawArc( int x, int y, real_t radius, real_t angle1, real_t angle2, Uint32 color, Uint8 alpha )
+void drawArc( int x, int y, real_t radius, real_t angle1, real_t angle2, const float* const pColor, Uint8 alpha )
+{
+	int c;
+
+	// update projection
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_LIGHTING);
+	glMatrixMode(GL_PROJECTION);
+	glViewport(0, 0, xres, yres);
+	glLoadIdentity();
+	glOrtho(0, xres, 0, yres, -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glEnable(GL_BLEND);
+
+	// set line width
+	GLint lineWidth;
+	glGetIntegerv(GL_LINE_WIDTH, &lineWidth);
+	glLineWidth(2);
+
+	// draw line
+	glColor4fv(pColor);
+	//glColor4f(((Uint8)(color >> mainsurface->format->Rshift)) / 255.f, ((Uint8)(color >> mainsurface->format->Gshift)) / 255.f, ((Uint8)(color >> mainsurface->format->Bshift)) / 255.f, alpha / 255.f);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glEnable(GL_LINE_SMOOTH);
+	glBegin(GL_LINE_STRIP);
+	for ( c = angle1; c <= angle2; c++)
+	{
+		float degInRad = c * PI / 180.f;
+		glVertex2f(x + ceil(cos(degInRad)*radius) + 1, yres - (y + ceil(sin(degInRad)*radius)));
+	}
+	glEnd();
+	glDisable(GL_LINE_SMOOTH);
+
+	// reset line width
+	glLineWidth(lineWidth);
+}
+
+void drawArc(int x, int y, real_t radius, real_t angle1, real_t angle2, Uint32 color, Uint8 alpha)
 {
 	int c;
 
@@ -215,7 +257,7 @@ void drawArc( int x, int y, real_t radius, real_t angle1, real_t angle2, Uint32 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glEnable(GL_LINE_SMOOTH);
 	glBegin(GL_LINE_STRIP);
-	for ( c = angle1; c <= angle2; c++)
+	for ( c = angle1; c <= angle2; c++ )
 	{
 		float degInRad = c * PI / 180.f;
 		glVertex2f(x + ceil(cos(degInRad)*radius) + 1, yres - (y + ceil(sin(degInRad)*radius)));
@@ -226,6 +268,7 @@ void drawArc( int x, int y, real_t radius, real_t angle1, real_t angle2, Uint32 
 	// reset line width
 	glLineWidth(lineWidth);
 }
+
 
 /*-------------------------------------------------------------------------------
 
